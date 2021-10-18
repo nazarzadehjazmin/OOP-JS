@@ -291,14 +291,141 @@ if('radius' in circle)
 // ABSTRACTION
 ////////////////////////////////////////////////////////////////////
 
-function Circle(radius) {
-    this.radius = radius; 
-    this.defaultLocation = { x: 0, y: 0 };
-    this.computeOptimumLocation = function() {
+//Not everything in our objects has to be public and accesible from the outside
+//Hide the details and expose only the essentials
 
-    }
+/*
+function Circle(radius) {
+    //let color = 'red'; 
+    //it's not set as a property of an object. 
+    //It's just a local variable inside this fx
+    //When we get out of this fx, this variable goes out of scope and dies
+
+
+    this.radius = radius; 
+
+    //this.defaultLocation = { x: 0, y: 0 }; //public 
+    let defaultLocation = { x: 0, y: 0 }; //private
+    //instead of setting it as a property, we define it as a local variable
+
+
+    //this.computeOptimumLocation = function(factor) {
+    //} //public method
+
+    let computeOptimumLocation = function(factor) {
+
+    }//private method
+
     this.draw = function () {
-        this.computeOptimumLocation();
+        //CLOSURE = This fx can access to all the variables of computeOptimumLocation too
+  
+        //this.computeOptimumLocation(0.1);
+        computeOptimumLocation(0.1);
+
+        //ACCESS
+        //defaultLocation
+        //this.radius
+
+
+
         console.log('draw');
     }
+}
+
+const circle = new Circle(10);
+circle.draw();
+*/
+
+/*
+CLOSURE
+Determinates what variables will be accessible to an inner fx
+
+SCOPE is temporary (the variable dies when we finish the fx) but CLOSURE stays there (the variable not die when we finish the fx)
+
+All the things that were private here, were PRIVATE MEMBERS of the circle object
+*/
+
+
+////////////////////////////////////////////////////////////////////
+//SETTERS AND GETTERS
+////////////////////////////////////////////////////////////////////
+
+//We want to access to private members of the object
+
+/*
+function Circle(radius) {
+    this.radius = radius; 
+    let defaultLocation = { x: 0, y: 0 }; 
+
+    this.getDefaultLocation = function() {
+        return defaultLocation;
+    } //we can access to defaultLocation as a getDefaultLocation
+
+    this.draw = function () {
+        console.log('draw');
+    }
+
+    Object.defineProperty(
+        this, 
+        'defaultLocation', 
+        { 
+            get: function() { //just getters = properties are read only
+                return defaultLocation;
+            }, 
+        
+            set: function(value) { //change values of the properties
+                if(!value.x || !value.y)
+                    throw new Error('Invalid location');
+
+                defaultLocation = value;
+            }
+        }
+    ); 
+
+}
+
+const circle = new Circle(10);
+circle.defaultLocation = 1;
+circle.draw();
+*/
+
+
+////////////////////////////////////////////////////////////////////
+//EXERCISES
+////////////////////////////////////////////////////////////////////
+
+function Stopwatch() {
+    let startTime, endTime, running, duration = 0;
+    
+    this.start = function() {
+        if(running)
+            throw new Error('Stopwatch has already started.');
+
+        running = true;
+
+        startTime = new Date();
+    };
+
+    this.stop = function() {
+        if(!running)
+            throw new Error('Stopwatch is not started.');
+
+        running = false;
+
+        endTime = new Date();
+
+        const seconds = (endTime.getTime() - startTime.getTime()) / 1000;
+        duration += seconds;
+    };
+    
+    this.reset = function() {
+        startTime = null;
+        endTime = null;
+        running = false;
+        duration = 0;
+    };
+
+    Object.defineProperty(this, 'duration', {
+        get: function() { return duration; }
+    });
 }
